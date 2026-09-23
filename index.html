@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobAround — Junior Content & Digital Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --dark: #0f172a;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-nudge: 0 20px 25px -5px rgba(0,0,0,0.25);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .site-header {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.875rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+
+        .brand-logo {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: -0.025em;
+        }
+
+        .brand-logo span { color: var(--dark); }
+
+        .search-bar-mini {
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-body);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.5rem 0.875rem;
+            flex-grow: 1;
+            max-width: 480px;
+            gap: 0.5rem;
+        }
+
+        .search-bar-mini input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 0.875rem;
+            width: 100%;
+            color: var(--text-main);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.938rem;
+        }
+
+        .btn-auth {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--dark);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+
+        .main-wrapper {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .job-card-main {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .job-header-block {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .company-badge-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .company-logo-placeholder {
+            width: 56px;
+            height: 56px;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+
+        .company-info h2 { font-size: 1.125rem; color: var(--dark); font-weight: 600; }
+        .company-info p { font-size: 0.875rem; color: var(--text-muted); }
+
+        .job-title {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark);
+            line-height: 1.25;
+            margin-bottom: 1rem;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.625rem;
+            margin-top: 1rem;
+        }
+
+        .tag-pill {
+            background-color: var(--bg-body);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.375rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.813rem;
+            font-weight: 500;
+        }
+
+        .tag-pill.highlight {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border-color: rgba(37, 99, 235, 0.2);
+            font-weight: 600;
+        }
+
+        .content-section { margin-bottom: 2.25rem; }
+        .content-section h3 {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .content-section p, .content-section ul { font-size: 1rem; color: var(--text-main); line-height: 1.7; }
+        .content-section ul { list-style-type: none; padding-left: 0; }
+        .content-section ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.625rem;
+        }
+
+        .content-section ul li::before {
+            content: "•";
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.25rem;
+            position: absolute;
+            left: 0;
+            top: -0.1rem;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .gallery-item {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            background-color: var(--border);
+        }
+
+        .sidebar-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            position: sticky;
+            top: 5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-apply-primary {
+            display: block;
+            width: 100%;
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-family: var(--font-heading);
+            font-size: 1.063rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-apply-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-apply-primary:disabled {
+            background-color: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        .meta-info-list {
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            padding-top: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .meta-item { display: flex; justify-content: space-between; font-size: 0.875rem; }
+        .meta-label { color: var(--text-muted); }
+        .meta-value { font-weight: 600; color: var(--dark); }
+
+        .bottom-cta-banner {
+            margin-top: 3rem;
+            background-color: var(--dark);
+            color: #ffffff;
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            text-align: center;
+        }
+
+        .bottom-cta-banner h3 { font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .bottom-cta-banner p { color: var(--border); margin-bottom: 1.5rem; }
+        .bottom-cta-banner .btn-apply-primary {
+            max-width: 320px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            color: var(--dark);
+        }
+
+        /* POPUP NUDGES */
+        .nudge-container {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .nudge-card {
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            color: #ffffff;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.938rem;
+            box-shadow: var(--shadow-nudge);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            max-width: 380px;
+        }
+
+        .nudge-card.visible { transform: translateY(0); opacity: 1; }
+        .nudge-social { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-left: 4px solid var(--primary); }
+        .nudge-scarcity { background: linear-gradient(135deg, #7c2d12 0%, #9a3412 100%); border-left: 4px solid #f97316; }
+
+        .nudge-icon {
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 900px) {
+            .main-wrapper { grid-template-columns: 1fr; }
+            .sidebar-card { position: static; }
+            .search-bar-mini { display: none; }
+            .nudge-container { left: 12px; right: 12px; bottom: 12px; }
+            .nudge-card { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="header-container">
+            <a href="#" class="brand-logo">JobAround<span>.</span></a>
+            <div class="search-bar-mini">
+                <input type="text" value="Junior Content Assistant" readonly>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#">Cerca Lavoro</a></li>
+                <li><a href="#">Aziende</a></li>
+                <li><button class="btn-auth">Accedi</button></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="main-wrapper">
+        <article class="job-card-main">
+            <div class="job-header-block">
+                <div class="company-badge-row">
+                    <div class="company-logo-placeholder">NX</div>
+                    <div class="company-info">
+                        <h2>Nexia Digital Solutions</h2>
+                        <p>Azienda verificata • Servizi IT e Media Digitali</p>
+                    </div>
+                </div>
+                <h1 class="job-title">Junior Content & Digital Assistant</h1>
+                <div class="tags-container">
+                    <span class="tag-pill highlight">💼 Contratto Full-time</span>
+                    <span class="tag-pill highlight">🏠 Prevalentemente da Remoto</span>
+                    <span class="tag-pill">💰 €23.000 - €26.000 /anno</span>
+                    <span class="tag-pill">🌱 Livello Junior</span>
+                </div>
+            </div>
+
+            <section class="content-section">
+                <h3>Descrizione della posizione</h3>
+                <p>Siamo alla ricerca di un <strong>Junior Content & Digital Assistant</strong> da inserire nel nostro team operativo. La risorsa lavorerà prevalentemente da remoto, occupandosi della gestione e dell'aggiornamento di piattaforme digitali, pubblicazione di contenuti e supporto operativo quotidiano.</p>
+            </section>
+
+            <section class="content-section">
+                <h3>Mansioni principali</h3>
+                <ul>
+                    <li>Pubblicazione e formattazione di articoli e contenuti sui portali aziendali.</li>
+                    <li>Aggiornamento costante delle pagine web e dei database interni.</li>
+                    <li>Caricamento, organizzazione e catalogazione di asset digitali.</li>
+                    <li>Supporto alla pianificazione e verifica dei canali social media aziendali.</li>
+                    <li>Verifica della corretta impaginazione dei materiali digitali.</li>
+                </ul>
+            </section>
+
+            <section class="content-section">
+                <h3>Requisiti richiesti</h3>
+                <ul>
+                    <li>Familiarità con l'uso del computer e dei principali strumenti web.</li>
+                    <li>Buona capacità di organizzazione del lavoro e precisione operativa.</li>
+                    <li>Conoscenza base dei principali social media e CMS (es. WordPress).</li>
+                    <li>Attitudine al lavoro in team e buona gestione delle tempistiche.</li>
+                </ul>
+            </section>
+
+            <section class="content-section">
+                <h3>Perché lavorare con noi</h3>
+                <p>In Nexia Digital Solutions crediamo nella crescita delle risorse junior. Offriamo un ambiente di lavoro flessibile e collaborativo.</p>
+                <ul>
+                    <li>Formazione affiancata nei primi 3 mesi.</li>
+                    <li>Massima flessibilità oraria e lavoro da casa.</li>
+                    <li>Fornitura di strumentazione hardware professionale.</li>
+                </ul>
+            </section>
+
+            <section class="content-section">
+                <h3>Il nostro ambiente di lavoro</h3>
+                <div class="gallery-grid">
+                    <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80" alt="Ufficio moderno" class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80" alt="Team al lavoro" class="gallery-item">
+                </div>
+            </section>
+
+            <div class="bottom-cta-banner">
+                <h3>Ti interessa questa posizione?</h3>
+                <p>L'invio della candidatura richiede meno di 2 minuti.</p>
+                <button class="btn-apply-primary" id="btn-apply-bottom" data-source="bottom_apply">Candidati ora</button>
+            </div>
+        </article>
+
+        <aside class="sidebar-card">
+            <button class="btn-apply-primary" id="btn-apply-sidebar" data-source="sidebar_apply">Candidati ora</button>
+            <div class="meta-info-list">
+                <div class="meta-item"><span class="meta-label">Pubblicato:</span><span class="meta-value">2 giorni fa</span></div>
+                <div class="meta-item"><span class="meta-label">Modalità:</span><span class="meta-value">Smart Working</span></div>
+                <div class="meta-item"><span class="meta-label">Sede fisica:</span><span class="meta-value">Occasionale</span></div>
+                <div class="meta-item"><span class="meta-label">Candidati totali:</span><span class="meta-value">148</span></div>
+            </div>
+        </aside>
+    </main>
+
+    <div class="nudge-container">
+        <div id="nudge-social" class="nudge-card nudge-social">
+            <div class="nudge-icon">👀</div>
+            <div class="nudge-text">Altre 23 persone stanno guardando l'annuncio</div>
+        </div>
+
+        <div id="nudge-scarcity" class="nudge-card nudge-scarcity">
+            <div class="nudge-icon">⚡</div>
+            <div class="nudge-text">Mancano solo 2 posizioni</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // INSERISCI QUI LE TUE CREDENZIALI FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyAbiAqFBpa5mASyyCxAIiZ4NvZ8gqoF7_o",
+    authDomain: "tesipop-522d6.firebaseapp.com",
+    projectId: "tesipop-522d6",
+    storageBucket: "tesipop-522d6.firebasestorage.app",
+    messagingSenderId: "499140959880",
+    appId: "1:499140959880:web:04c18951fec60ded28c93d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const GOOGLE_FORM_URL = "https://forms.gle/9JLhFcSUia5XnwH28";
+
+        const sessionData = {
+            sessionId: "session_" + crypto.randomUUID(),
+            entryTime: new Date().toISOString(),
+            entryTimestamp: Date.now(),
+            socialProofShownAt: null,
+            scarcityShownAt: null,
+            clickTime: null,
+            timeToApply: null,
+            timeOnPage: null,
+            button: null,
+            exitTime: null
+        };
+
+        let applicationSubmitted = false;
+
+        // Timer Popups
+        setTimeout(() => {
+            document.getElementById('nudge-social').classList.add('visible');
+            sessionData.socialProofShownAt = ((Date.now() - sessionData.entryTimestamp) / 1000).toFixed(2);
+        }, 3500);
+
+        setTimeout(() => {
+            document.getElementById('nudge-scarcity').classList.add('visible');
+            sessionData.scarcityShownAt = ((Date.now() - sessionData.entryTimestamp) / 1000).toFixed(2);
+        }, 7000);
+
+        document.getElementById('btn-apply-sidebar').addEventListener('click', handleApplyClick);
+        document.getElementById('btn-apply-bottom').addEventListener('click', handleApplyClick);
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden' && !applicationSubmitted) {
+                sessionData.exitTime = new Date().toISOString();
+                sessionData.timeOnPage = parseFloat(((Date.now() - sessionData.entryTimestamp) / 1000).toFixed(2));
+            }
+        });
+
+        async function handleApplyClick(event) {
+            if (applicationSubmitted) return;
+            applicationSubmitted = true;
+
+            const clickTimestamp = Date.now();
+            const btnSource = event.currentTarget.getAttribute('data-source');
+
+            sessionData.clickTime = new Date().toISOString();
+            sessionData.timeToApply = parseFloat(((clickTimestamp - sessionData.entryTimestamp) / 1000).toFixed(2));
+            sessionData.timeOnPage = sessionData.timeToApply;
+            sessionData.button = btnSource;
+
+            document.querySelectorAll('.btn-apply-primary').forEach(btn => {
+                btn.disabled = true;
+                btn.innerText = "Elaborazione...";
+            });
+
+            try {
+                const docRef = doc(db, "experiments", "jobaround", "sessions", sessionData.sessionId);
+                await setDoc(docRef, {
+                    sessionId: sessionData.sessionId,
+                    entryTime: sessionData.entryTime,
+                    clickTime: sessionData.clickTime,
+                    timeToApply: sessionData.timeToApply,
+                    timeOnPage: sessionData.timeOnPage,
+                    button: sessionData.button,
+                    socialProofShownAt: sessionData.socialProofShownAt ? parseFloat(sessionData.socialProofShownAt) : null,
+                    scarcityShownAt: sessionData.scarcityShownAt ? parseFloat(sessionData.scarcityShownAt) : null,
+                    createdAt: serverTimestamp()
+                });
+
+                window.location.href = GOOGLE_FORM_URL;
+            } catch (error) {
+                console.error("Errore salvataggio:", error);
+                setTimeout(() => { window.location.href = GOOGLE_FORM_URL; }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>

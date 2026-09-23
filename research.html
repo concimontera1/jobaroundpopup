@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobAround — Research Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --dark: #0f172a;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --bg-body: #f8fafc;
+            --border: #e2e8f0;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        .research-dashboard {
+            max-width: 1280px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            border: 1px solid var(--border);
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--bg-body);
+        }
+
+        .dashboard-header h2 { font-family: var(--font-heading); font-size: 1.5rem; color: var(--dark); }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: var(--bg-body);
+            padding: 1.25rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        .kpi-card .val {
+            font-family: var(--font-heading);
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .kpi-card .lbl {
+            font-size: 0.813rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .data-table-container { overflow-x: auto; margin-bottom: 2rem; }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+            text-align: left;
+        }
+
+        .data-table th, .data-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+        .data-table th { background-color: var(--bg-body); font-weight: 700; color: var(--dark); }
+
+        .btn-export {
+            background-color: var(--dark);
+            color: #ffffff;
+            padding: 0.625rem 1.25rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 0.5rem;
+        }
+
+        .btn-export:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+    <div class="research-dashboard">
+        <div class="dashboard-header">
+            <div>
+                <h2>📊 JobAround — Research & Analytics Dashboard</h2>
+                <p style="color: var(--text-muted); font-size: 0.875rem;">Raccolta dati comportamentali in tempo reale (Firestore)</p>
+            </div>
+            <div>
+                <button class="btn-export" id="btn-export-csv">Esporta CSV</button>
+                <button class="btn-export" id="btn-export-json">Esporta JSON</button>
+            </div>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="lbl">Totale Partecipanti</div>
+                <div class="val" id="kpi-total">-</div>
+            </div>
+            <div class="kpi-card">
+                <div class="lbl">Tempo Medio Click (s)</div>
+                <div class="val" id="kpi-mean">-</div>
+            </div>
+            <div class="kpi-card">
+                <div class="lbl">Tempo Mediano (s)</div>
+                <div class="val" id="kpi-median">-</div>
+            </div>
+            <div class="kpi-card">
+                <div class="lbl">Min / Max (s)</div>
+                <div class="val" id="kpi-minmax">-</div>
+            </div>
+            <div class="kpi-card">
+                <div class="lbl">Sidebar vs Bottom</div>
+                <div class="val" id="kpi-buttons">-</div>
+            </div>
+        </div>
+
+        <div class="data-table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Session ID</th>
+                        <th>Entrata (ISO)</th>
+                        <th>Click (ISO)</th>
+                        <th>Time to Apply (s)</th>
+                        <th>Pulsante</th>
+                        <th>Social Proof (s)</th>
+                        <th>Scarcity (s)</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <tr><td colspan="7" style="text-align: center;">Caricamento dati da Firestore...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // INSERISCI QUI LE STESSE CREDENZIALI FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyAbiAqFBpa5mASyyCxAIiZ4NvZ8gqoF7_o",
+    authDomain: "tesipop-522d6.firebaseapp.com",
+    projectId: "tesipop-522d6",
+    storageBucket: "tesipop-522d6.firebasestorage.app",
+    messagingSenderId: "499140959880",
+    appId: "1:499140959880:web:04c18951fec60ded28c93d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let cachedDataset = [];
+
+        async function initDashboard() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "experiments", "jobaround", "sessions"));
+                cachedDataset = [];
+
+                querySnapshot.forEach((doc) => {
+                    cachedDataset.push(doc.data());
+                });
+
+                renderDashboard(cachedDataset);
+
+                document.getElementById('btn-export-csv').addEventListener('click', exportCSV);
+                document.getElementById('btn-export-json').addEventListener('click', exportJSON);
+
+            } catch (error) {
+                console.error("Errore caricamento dashboard:", error);
+                document.getElementById('table-body').innerHTML = `<tr><td colspan="7" style="color: red; text-align: center;">Errore nel recupero dati da Firestore. Verificare la configurazione Firebase.</td></tr>`;
+            }
+        }
+
+        function renderDashboard(data) {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Nessuna sessione registrata nel database.</td></tr>`;
+                return;
+            }
+
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><code>${row.sessionId}</code></td>
+                    <td>${row.entryTime ? new Date(row.entryTime).toLocaleTimeString() : '-'}</td>
+                    <td>${row.clickTime ? new Date(row.clickTime).toLocaleTimeString() : '-'}</td>
+                    <td><strong>${row.timeToApply !== undefined ? row.timeToApply + 's' : '-'}</strong></td>
+                    <td>${row.button || '-'}</td>
+                    <td>${row.socialProofShownAt !== null && row.socialProofShownAt !== undefined ? row.socialProofShownAt + 's' : 'Non mostrato'}</td>
+                    <td>${row.scarcityShownAt !== null && row.scarcityShownAt !== undefined ? row.scarcityShownAt + 's' : 'Non mostrato'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const validTimes = data.map(d => d.timeToApply).filter(t => typeof t === 'number' && !isNaN(t)).sort((a,b) => a - b);
+            const total = data.length;
+
+            if (validTimes.length > 0) {
+                const sum = validTimes.reduce((a, b) => a + b, 0);
+                const mean = (sum / validTimes.length).toFixed(2);
+                
+                const mid = Math.floor(validTimes.length / 2);
+                const median = validTimes.length % 2 !== 0 ? validTimes[mid] : ((validTimes[mid - 1] + validTimes[mid]) / 2).toFixed(2);
+                
+                const min = validTimes[0];
+                const max = validTimes[validTimes.length - 1];
+
+                const sidebarCount = data.filter(d => d.button === 'sidebar_apply').length;
+                const bottomCount = data.filter(d => d.button === 'bottom_apply').length;
+
+                document.getElementById('kpi-total').innerText = total;
+                document.getElementById('kpi-mean').innerText = mean;
+                document.getElementById('kpi-median').innerText = median;
+                document.getElementById('kpi-minmax').innerText = `${min}s / ${max}s`;
+                document.getElementById('kpi-buttons').innerText = `${sidebarCount} / ${bottomCount}`;
+            }
+        }
+
+        function exportCSV() {
+            if (cachedDataset.length === 0) return alert("Nessun dato da esportare.");
+
+            const headers = ["sessionId", "entryTime", "clickTime", "timeToApply", "timeOnPage", "button", "socialProofShownAt", "scarcityShownAt"];
+            const csvRows = [headers.join(",")];
+
+            cachedDataset.forEach(row => {
+                const values = headers.map(header => `"${row[header] === null || row[header] === undefined ? "" : row[header]}"`);
+                csvRows.push(values.join(","));
+            });
+
+            downloadFile(csvRows.join("\n"), 'jobaround_data.csv', 'text/csv');
+        }
+
+        function exportJSON() {
+            if (cachedDataset.length === 0) return alert("Nessun dato da esportare.");
+            downloadFile(JSON.stringify(cachedDataset, null, 2), 'jobaround_data.json', 'application/json');
+        }
+
+        function downloadFile(content, fileName, contentType) {
+            const a = document.createElement("a");
+            const file = new Blob([content], { type: contentType });
+            a.href = URL.createObjectURL(file);
+            a.download = fileName;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        initDashboard();
+    </script>
+</body>
+</html>
